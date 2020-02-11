@@ -38,7 +38,20 @@
 	(with-standard-io-syntax
 	  (setf *db* (read in)))))
 
+(defun where (&key title artist rating (ripped nil ripped-p))
+  #'(lambda (cd)
+	  (and
+		(if title (equal (getf cd :title) title) t)
+		(if artist (equal (getf cd :artist) artist) t)
+		(if rating (equal (getf cd :rating) rating) t)
+		(if ripped-p (equal (getf cd :ripped) ripped) t))))
+
+(defun select (selector-fn)
+  (remove-if-not selector-fn *db*))
+
 (if (y-or-n-p "Load?") (load-db (prompt-read "Enter file name")))
 (if (y-or-n-p "Add new CD?") (add-cds))
 (if (y-or-n-p "Show DB?") (dump-db))
 (if (y-or-n-p "Save DB?") (save-db (prompt-read "Enter file name")))
+
+(print (select (where :artist "LP")))
